@@ -35,7 +35,7 @@ const questions = () => {
           "Add Department",
           "Add Employee",
           "Add Role",
-          "Update Employee Role",
+          "Update Employee",
         ],
       },
     ])
@@ -59,7 +59,7 @@ const questions = () => {
         case "Add Role":
           addRole();
           break;
-        case "Update Employee Role":
+        case "Update Employee":
           update();
           break;
       }
@@ -130,8 +130,6 @@ const addDepartment = () => {
     });
 };
 
-// TODO: This function is broken find out why the managerArr and roleArr break the function or find a different way to do the same thing.
-
 const addEmployee = () => {
   let managerArr = [];
   let roleArr = [];
@@ -176,13 +174,11 @@ const addEmployee = () => {
       choices: managerArr,
     },
   ])
-  // TODO: doesn't seem to be inserting properly
+
   .then(res => {
-    // created a const for role_id so i can connect to tables in the same function
     const role_id = roleArr.indexOf(res.role) + 1;
     const manager_id = managerArr.indexOf(res.manager) + 1;
 
-    //  create a variable for new employees
     const newEmployee = {
       first_name: res.first_name,
       last_name: res.last_name,
@@ -190,7 +186,6 @@ const addEmployee = () => {
       role_id: role_id,
     };
 
-    // function to insert new employee to the database
     db.query("INSERT INTO employee SET ?", newEmployee, err => {
       if (err) throw err;
       questions();
@@ -226,23 +221,58 @@ const addRole = () => {
     });
 };
 
-// const update = () => {
-//   let employeeArr = [];
-//   let roleArr = [];
-//   inquirer
-//     .prompt([
-//       {
-//       name: "selection",
-//       type: "list",
-//       message: "Please choose the employee to update",
-//       choices: employeeArr
-//     },
-//     ]).then(function(res){
-//       db.query = `SELECT first_name, last_name, id 
-//       FROM employee 
-//       WHERE first_name = ${res.selection}`
-//     })
-    
+const update = () => {
+  let employeeArr = [];
+  let roleArr = [];
 
-// };
+  db.query(
+    "SELECT first_name, last_name FROM employee",
+    (err, results) => {
+      results.map(employee =>
+        employeeArr.push(`${employee.first_name} ${employee.last_name}`)
+      );
+      return employeeArr;
+    }
+  );
+
+  db.query(
+    "SELECT * FROM role ", (err, results) => {
+    if (err) throw err;
+    results.map(role => roleArr.push(`${role.title}`));
+    return roleArr;
+  })
+  // TODO odd error where the array is only pulled in when you have another question before it
+  inquirer
+    .prompt([
+      {type: "list",
+       name: "test-list",
+       message: "test",
+       choices: [1, 2, 3, 4, 5]  
+    },
+      {
+        type: "list",
+        name: "selection",
+        message: "Please select the employee to update",
+        choices: employeeArr,
+      },
+
+    {
+      type: "list",
+      message: "what is the employee's new role?",
+      name: "role",
+      choices: roleArr,
+    },
+    ])
+    .then(res =>{
+      const role_id = roleArr.indexOf(res.role) + 1;
+      const employee_id = employeeArr.indexOf(res.selection) + 1;
+      console.log(role_id);
+      console.log(employee_id);
+      
+      db.query (`UPDATE employee SET role_id= ${role_id} WHERE id= ${employee_id} `, (err) =>{
+        if(err) throw err;
+        questions();
+      })
+    })
+};
 
