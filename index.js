@@ -164,31 +164,36 @@ const addEmployee = () => {
       name: "last_name",
     },
     {
-      type: "rawlist",
+      type: "list",
       message: "what is the employee's role?",
       name: "role",
       choices: roleArr,
     },
     {
+      type: "list",
       name: "manager",
       message: "What is their manager's name?",
-      type: "rawlist",
       choices: managerArr,
     },
   ])
   // TODO: doesn't seem to be inserting properly
-    .then(function(res) {
-      const roleId = selectRole().indexOf(res.role) + 1;
-      const managerId = selectManager().indexOf(val.choice) + 1;
-      db.query("INSERT INTO employee SET ?", {
-          first_name: res.first_name,
-          last_name: res.last_name,
-          manager_id: managerId,
-          role_id: roleId
-      }, function(err) {
-          if (err) throw err
-          console.table(res)
-          questions()
+  .then(res => {
+    // created a const for role_id so i can connect to tables in the same function
+    const role_id = roleArr.indexOf(res.role) + 1;
+    const manager_id = managerArr.indexOf(res.manager) + 1;
+
+    //  create a variable for new employees
+    const newEmployee = {
+      first_name: res.first_name,
+      last_name: res.last_name,
+      manager_id: manager_id,
+      role_id: role_id,
+    };
+
+    // function to insert new employee to the database
+    db.query("INSERT INTO employee SET ?", newEmployee, err => {
+      if (err) throw err;
+      questions();
       })
   })
 };
@@ -221,5 +226,23 @@ const addRole = () => {
     });
 };
 
-// const update = () => {};
+// const update = () => {
+//   let employeeArr = [];
+//   let roleArr = [];
+//   inquirer
+//     .prompt([
+//       {
+//       name: "selection",
+//       type: "list",
+//       message: "Please choose the employee to update",
+//       choices: employeeArr
+//     },
+//     ]).then(function(res){
+//       db.query = `SELECT first_name, last_name, id 
+//       FROM employee 
+//       WHERE first_name = ${res.selection}`
+//     })
+    
+
+// };
 
