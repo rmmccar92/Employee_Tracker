@@ -1,16 +1,12 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 
-
-
-const db = mysql.createConnection(
-  {
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "employee_db",
-  },
-);
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "employee_db",
+});
 
 db.connect((err) => {
   if (err) {
@@ -136,64 +132,69 @@ const addEmployee = () => {
   db.query(
     "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL",
     (err, results) => {
-      results.map(manager =>
+      results.map((manager) =>
         managerArr.push(`${manager.first_name} ${manager.last_name}`)
       );
       return managerArr;
     }
   );
 
-  db.query(
-    "SELECT * FROM role ", (err, results) => {
+  db.query("SELECT * FROM role ", (err, results) => {
     if (err) throw err;
-    results.map(role => roleArr.push(`${role.title}`));
+    results.map((role) => roleArr.push(`${role.title}`));
     return roleArr;
-  })
+  });
   inquirer
-  .prompt([
-    {
-      type: "input",
-      message: "What is the employee's first name?",
-      name: "first_name",
-    },
-    {
-      type: "input",
-      message: "what is the employee's last name?",
-      name: "last_name",
-    },
-    {
-      type: "list",
-      message: "what is the employee's role?",
-      name: "role",
-      choices: roleArr,
-    },
-    {
-      type: "list",
-      name: "manager",
-      message: "What is their manager's name?",
-      choices: managerArr,
-    },
-  ])
+    .prompt([
+      {
+        type: "input",
+        message: "What is the employee's first name?",
+        name: "first_name",
+      },
+      {
+        type: "input",
+        message: "what is the employee's last name?",
+        name: "last_name",
+      },
+      {
+        type: "list",
+        message: "what is the employee's role?",
+        name: "role",
+        choices: roleArr,
+      },
+      {
+        type: "list",
+        name: "manager",
+        message: "What is their manager's name?",
+        choices: managerArr,
+      },
+    ])
 
-  .then(res => {
-    const role_id = roleArr.indexOf(res.role) + 1;
-    const manager_id = managerArr.indexOf(res.manager) + 1;
+    .then((res) => {
+      const role_id = roleArr.indexOf(res.role) + 1;
+      const manager_id = managerArr.indexOf(res.manager) + 1;
 
-    const newEmployee = {
-      first_name: res.first_name,
-      last_name: res.last_name,
-      manager_id: manager_id,
-      role_id: role_id,
-    };
+      const newEmployee = {
+        first_name: res.first_name,
+        last_name: res.last_name,
+        manager_id: manager_id,
+        role_id: role_id,
+      };
 
-    db.query("INSERT INTO employee SET ?", newEmployee, err => {
-      if (err) throw err;
-      questions();
-      })
-  })
+      db.query("INSERT INTO employee SET ?", newEmployee, (err) => {
+        if (err) throw err;
+        questions();
+      });
+    });
 };
 const addRole = () => {
-  return inquirer
+  let departmentArr = [];
+  db.query("SELECT * FROM department;", (err, results) => {
+    if (err) throw err;
+    results.map((department) => departmentArr.push(`${department.name}`));
+    return departmentArr;
+  });
+   inquirer
     .prompt([
       {
         name: "job_title",
@@ -205,19 +206,31 @@ const addRole = () => {
         type: "input",
         message: "Please enter the salary for specified role.",
       },
+
+      {
+        name: "department",
+        type: "list",
+        message: "Role Department?",
+        choices: departmentArr,
+      },
     ])
 
     .then(function (res) {
-      (db.query = `INSERT INTO role SET ?`),
+      const department_id = departmentArr.indexOf(res.department) + 1;
+      const query = "INSERT INTO role SET ?";
+      db.query(
+        query,
         {
           title: res.job_title,
           salary: res.salary,
+          department_id: department_id
         },
         function (err) {
           if (err) throw err;
           console.table(res);
           questions();
-        };
+        }
+      );
     });
 };
 
@@ -225,30 +238,25 @@ const update = () => {
   let employeeArr = [];
   let roleArr = [];
 
-  db.query(
-    "SELECT first_name, last_name FROM employee",
-    (err, results) => {
-      results.map(employee =>
-        employeeArr.push(`${employee.first_name} ${employee.last_name}`)
-      );
-      return employeeArr;
-    }
-  );
+  db.query("SELECT first_name, last_name FROM employee", (err, results) => {
+    results.map((employee) =>
+      employeeArr.push(`${employee.first_name} ${employee.last_name}`)
+    );
+    return employeeArr;
+  });
 
-  db.query(
-    "SELECT * FROM role ", (err, results) => {
+  db.query("SELECT * FROM role ", (err, results) => {
     if (err) throw err;
-    results.map(role => roleArr.push(`${role.title}`));
+    results.map((role) => roleArr.push(`${role.title}`));
     return roleArr;
-  })
-  // TODO odd error where the array is only pulled in when you have another question before it
+  });
   inquirer
     .prompt([
-      {type: "list",
-       name: "test-list",
-       message: "test",
-       choices: [1, 2, 3, 4, 5]  
-    },
+      {
+        type: "confirm",
+        name: "confirm",
+        message: "confirm update?",
+      },
       {
         type: "list",
         name: "selection",
@@ -256,23 +264,24 @@ const update = () => {
         choices: employeeArr,
       },
 
-    {
-      type: "list",
-      message: "what is the employee's new role?",
-      name: "role",
-      choices: roleArr,
-    },
+      {
+        type: "list",
+        message: "what is the employee's new role?",
+        name: "role",
+        choices: roleArr,
+      },
     ])
-    .then(res =>{
+    .then((res) => {
       const role_id = roleArr.indexOf(res.role) + 1;
       const employee_id = employeeArr.indexOf(res.selection) + 1;
-      console.log(role_id);
-      console.log(employee_id);
-      
-      db.query (`UPDATE employee SET role_id= ${role_id} WHERE id= ${employee_id} `, (err) =>{
-        if(err) throw err;
-        questions();
-      })
-    })
-};
 
+      db.query(
+        `UPDATE employee SET role_id= ${role_id} WHERE id= ${employee_id} `,
+        (err) => {
+          if (err) throw err;
+          console.table(res);
+          questions();
+        }
+      );
+    });
+};

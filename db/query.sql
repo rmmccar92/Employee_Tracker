@@ -21,7 +21,6 @@ LEFT JOIN employee manager on manager.id = employee.manager_id;
 SELECT * 
 FROM employee
 WHERE manager_id IS NULL
-AND role_id = 1;
 
 SELECT id
 FROM employee
@@ -34,3 +33,11 @@ FROM employee;
 UPDATE employee
 SET role_id = 2
 WHERE id = 5;
+
+SELECT * FROM department;
+
+SELECT * FROM role;
+
+SELECT * FROM employee;
+
+SELECT id FROM role WHERE title ="Lawyer";
