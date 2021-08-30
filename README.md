@@ -29,11 +29,11 @@ Inquirer is needed to run this application within the command line.
 Pick an option from the list and follow the prompts as directed
 
 ## Demo
-[Demo 1](https://drive.google.com/file/d/1THrBlxQ-bTCOqYJsvWGFez254xVB5SV6/view)
+[Full Demo Video 1](https://drive.google.com/file/d/1THrBlxQ-bTCOqYJsvWGFez254xVB5SV6/view)
 
-[Demo 2](https://drive.google.com/file/d/1_XxRCgd4RyJWi9oiRhPouJwzB4rfa3DL/view)
+[Full Demo Video 2](https://drive.google.com/file/d/1_XxRCgd4RyJWi9oiRhPouJwzB4rfa3DL/view)
 
-![Demo](https://github.com/rmmccar92/Employee_Tracker/blob/main/Assets/Employee%20Tracker%20Demo%202.gif)
+![Demo](https://github.com/rmmccar92/Employee_Tracker/blob/main/Assets/Employee%20Tracker%20Demo%202.gif )
 
 
 ## Questions
