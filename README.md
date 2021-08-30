@@ -33,6 +33,8 @@ Pick an option from the list and follow the prompts as directed
 
 [Demo 2](https://drive.google.com/file/d/1_XxRCgd4RyJWi9oiRhPouJwzB4rfa3DL/view)
 
+![Demo](https://github.com/rmmccar92/Employee_Tracker/blob/main/Assets/Employee%20Tracker%20Demo%202.gif)
+
 
 ## Questions
     
